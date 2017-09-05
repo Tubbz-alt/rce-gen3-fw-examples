@@ -21,6 +21,8 @@ use work.AxiLitePkg.all;
 use work.AxiStreamPkg.all;
 
 entity DpmEmpty is
+   generic (
+      BUILD_INFO_G    : BuildInfoType);
    port (
 
       -- Debug
@@ -97,8 +99,8 @@ begin
    U_DpmCore: entity work.DpmCore 
       generic map (
          TPD_G          => TPD_C,
+         BUILD_INFO_G   => BUILD_INFO_G,
          RCE_DMA_MODE_G => RCE_DMA_PPI_C,
-         OLD_BSI_MODE_G => false,
          ETH_10G_EN_G   => false
       ) port map (
          i2cSda                   => i2cSda,

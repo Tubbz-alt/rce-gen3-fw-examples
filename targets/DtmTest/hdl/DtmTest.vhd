@@ -25,6 +25,8 @@ use work.AxiLitePkg.all;
 use work.AxiStreamPkg.all;
 
 entity DtmTest is
+   generic (
+      BUILD_INFO_G    : BuildInfoType);
    port (
 
       -- Debug
@@ -140,8 +142,8 @@ begin
    U_DtmCore: entity work.DtmCore 
       generic map (
          TPD_G          => TPD_C,
-         RCE_DMA_MODE_G => RCE_DMA_AXIS_C,
-         OLD_BSI_MODE_G => true
+         BUILD_INFO_G   => BUILD_INFO_G,
+         RCE_DMA_MODE_G => RCE_DMA_AXIS_C
       ) port map (
          i2cSda              => i2cSda,
          i2cScl              => i2cScl,

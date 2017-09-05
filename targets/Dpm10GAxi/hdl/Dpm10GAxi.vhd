@@ -37,6 +37,7 @@ use work.EthMacPkg.all;
 entity Dpm10GAxi is
    generic (
       TPD_G           : time                  := 1 ns;
+      BUILD_INFO_G    : BuildInfoType;
       PGP_LANES_G     : integer range 1 to 12 := 12;
       PGP_LINE_RATE_G : real                  := 3.125E9);
    port (
@@ -132,7 +133,7 @@ begin
       generic map (
          TPD_G              => TPD_G,
          RCE_DMA_MODE_G     => RCE_DMA_AXIS_C,
-         OLD_BSI_MODE_G     => false,
+         BUILD_INFO_G       => BUILD_INFO_G,
          ETH_10G_EN_G       => true,
          UDP_SERVER_EN_G    => true,
          UDP_SERVER_SIZE_G  => 1,

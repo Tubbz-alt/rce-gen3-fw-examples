@@ -23,6 +23,9 @@ use work.AxiLitePkg.all;
 use work.AxiStreamPkg.all;
 
 entity ZynqEval is
+   generic (
+      BUILD_INFO_G   : BuildInfoType
+   );
    port (
       i2cSda     : inout sl;
       i2cScl     : inout sl
@@ -58,6 +61,7 @@ begin
    U_EvalCore: entity work.EvalCore
       generic map (
          TPD_G          => TPD_C,
+         BUILD_INFO_G   => BUILD_INFO_G,
          RCE_DMA_MODE_G => RCE_DMA_AXIS_C
       )
       port map (

@@ -143,7 +143,6 @@ begin
          TPD_G          => TPD_G,
          BUILD_INFO_G   => BUILD_INFO_G,
          RCE_DMA_MODE_G => RCE_DMA_PPI_C,
-         OLD_BSI_MODE_G => false,
          ETH_10G_EN_G   => true) 
       port map (
          i2cSda             => i2cSda,
