@@ -100,7 +100,6 @@ architecture STRUCTURE of DpmPcie is
    signal userReadSlave      : AxiReadSlaveType;
    signal userReadMaster     : AxiReadMasterType;
    signal userInterrupt      : slv(USER_INT_COUNT_C-1 downto 0);
-   signal pcieResetL         : sl;
 
 begin
 
@@ -196,7 +195,6 @@ begin
          userReadMaster  => userReadMaster,
          pciRefClkP      => locRefClkP,
          pciRefClkM      => locRefClkM,
-         pcieResetL      => pcieResetL,
          pcieInt         => userInterrupt(USER_INT_COUNT_C-1),
          pcieRxP         => rtmToDpmHsP(0),
          pcieRxM         => rtmToDpmHsM(0),
@@ -204,7 +202,6 @@ begin
          pcieTxM         => dpmToRtmHsM(0)
       );
 
-   pcieResetL <= not sysClk200Rst;
    userInterrupt(USER_INT_COUNT_C-2 downto 0) <= (others=>'0');
 
    --------------------------------------------------

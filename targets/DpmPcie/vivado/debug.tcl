@@ -7,35 +7,79 @@
 ## may be copied, modified, propagated, or distributed except according to 
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
+set RUCKUS_DIR $::env(RUCKUS_DIR)
+set IMAGENAME  $::env(IMAGENAME)
+source -quiet ${RUCKUS_DIR}/vivado_env_var.tcl
+source -quiet ${RUCKUS_DIR}/vivado_proc.tcl
 
-# Get environment
-set TOP_DIR  $::env(TOP_DIR)
-set PROJ_DIR $::env(PROJ_DIR)
-
-# Open the run
+## Open the run
 open_run synth_1
 
-# Create core
+# Get a list of nets
+set netFile ${PROJ_DIR}/net_log.txt
+set fd [open ${netFile} "w"]
+set nl ""
+append nl [get_nets {U_PcieRoot/*}]
+
+regsub -all -line { } $nl "\n" nl
+puts $fd $nl
+close $fd
+
+## Setup configurations
 set ilaName u_ila_0
-create_debug_core ${ilaName} labtools_ila_v3
 
-# Configure Core
-set_property C_DATA_DEPTH 1024 [get_debug_cores ${ilaName}]
+## Create the core
+CreateDebugCore ${ilaName}
 
-# Configure Clock
-set_property port_width 1 [get_debug_ports ${ilaName}/clk]
-connect_debug_port ${ilaName}/clk \
-   [get_nets U_DpmCore/U_ArmRceG3Top/U_ArmRceG3DmaCntrl/U_ObCntrl/U_ReadCntrl/axiClk]
+## Set the record depth
+set_property C_DATA_DEPTH 8192 [get_debug_cores ${ilaName}]
 
-# First probe exists by default
-set_property port_width 1 [get_debug_ports ${ilaName}/probe0]
-connect_debug_port ${ilaName}/probe0 \
-   [get_nets U_DpmCore/U_ArmRceG3Top/U_ArmRceG3DmaCntrl/U_ObCntrl/U_ReadCntrl/axiClkRst]
+## Set the clock for the Core
+SetDebugCoreClk ${ilaName} {U_PcieRoot/intAxiClk}
+#SetDebugCoreClk ${ilaName} {U_PcieRoot/axiClk}
 
-# Debug ACP Write Controller
-set modulePath U_DpmCore/U_ArmRceG3Top/U_ArmRceG3DmaCntrl/U_ObCntrl/U_ReadCntrl
-source ${TOP_DIR}/modules/ArmRceG3/debug/debug_read_cntrl.tcl
+## Set the Probes
+#ConfigProbe ${ilaName} {U_PcieRoot/pcieReadMaster[0][arvalid]}
+#ConfigProbe ${ilaName} {U_PcieRoot/pcieReadMaster[0][araddr][*]}
+#ConfigProbe ${ilaName} {U_PcieRoot/pcieReadMaster[0][rready]}
+#ConfigProbe ${ilaName} {U_PcieRoot/pcieReadSlave[0][arready]}
+#ConfigProbe ${ilaName} {U_PcieRoot/pcieReadSlave[0][rresp][*]}
+#ConfigProbe ${ilaName} {U_PcieRoot/pcieReadSlave[0][rvalid]}
 
-# Write the port map file
-write_debug_probes -force ${PROJ_DIR}/debug/debug_probes.ltx
+#ConfigProbe ${ilaName} {U_PcieRoot/pcieWriteMaster[0][awvalid]}
+#ConfigProbe ${ilaName} {U_PcieRoot/pcieWriteMaster[0][awaddr][*]}
+#ConfigProbe ${ilaName} {U_PcieRoot/pcieWriteMaster[0][bready]}
+#ConfigProbe ${ilaName} {U_PcieRoot/pcieWriteMaster[0][wvalid]}
+#ConfigProbe ${ilaName} {U_PcieRoot/pcieWriteSlave[0][awready]}
+#ConfigProbe ${ilaName} {U_PcieRoot/pcieWriteSlave[0][bresp][*]}
+#ConfigProbe ${ilaName} {U_PcieRoot/pcieWriteSlave[0][bvalid]}
+#ConfigProbe ${ilaName} {U_PcieRoot/pcieWriteSlave[0][wready]}
+
+ConfigProbe ${ilaName} {U_PcieRoot/intReadMaster[0][arvalid]}
+ConfigProbe ${ilaName} {U_PcieRoot/intReadMaster[0][araddr][*]}
+ConfigProbe ${ilaName} {U_PcieRoot/intReadMaster[0][rready]}
+ConfigProbe ${ilaName} {U_PcieRoot/intReadSlave[0][arready]}
+ConfigProbe ${ilaName} {U_PcieRoot/intReadSlave[0][rresp][*]}
+ConfigProbe ${ilaName} {U_PcieRoot/intReadSlave[0][rvalid]}
+
+ConfigProbe ${ilaName} {U_PcieRoot/intWriteMaster[0][awvalid]}
+ConfigProbe ${ilaName} {U_PcieRoot/intWriteMaster[0][awaddr][*]}
+ConfigProbe ${ilaName} {U_PcieRoot/intWriteMaster[0][bready]}
+ConfigProbe ${ilaName} {U_PcieRoot/intWriteMaster[0][wvalid]}
+ConfigProbe ${ilaName} {U_PcieRoot/intWriteSlave[0][awready]}
+ConfigProbe ${ilaName} {U_PcieRoot/intWriteSlave[0][bresp][*]}
+ConfigProbe ${ilaName} {U_PcieRoot/intWriteSlave[0][bvalid]}
+ConfigProbe ${ilaName} {U_PcieRoot/intWriteSlave[0][wready]}
+
+## Delete the last unused port
+delete_debug_port [get_debug_ports [GetCurrentProbe ${ilaName}]]
+
+## Write
+
+
+## Delete the last unused port
+delete_debug_port [get_debug_ports [GetCurrentProbe ${ilaName}]]
+
+## Write the port map file
+#write_debug_probes -force ${PROJ_DIR}/images/debug_probes_${IMAGENAME}.ltx
 
