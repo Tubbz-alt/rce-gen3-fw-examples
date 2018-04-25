@@ -1,5 +1,5 @@
 # Define Firmware Version Number
-export PRJ_VERSION = 0xDC100001
+export PRJ_VERSION = 0xDC100002
 
 export GIT_BYPASS 1
 
