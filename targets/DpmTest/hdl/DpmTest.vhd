@@ -116,8 +116,8 @@ begin
       generic map (
          TPD_G          => TPD_C,
          BUILD_INFO_G   => BUILD_INFO_G,
-         RCE_DMA_MODE_G => RCE_DMA_AXISV2_C,
-         --RCE_DMA_MODE_G => RCE_DMA_AXIS_C,
+         --RCE_DMA_MODE_G => RCE_DMA_AXISV2_C,
+         RCE_DMA_MODE_G => RCE_DMA_AXIS_C,
          ETH_10G_EN_G   => false
       ) port map (
          i2cSda                   => i2cSda,
@@ -221,7 +221,6 @@ begin
    U_PrbsGen: for i in 0 to 3 generate
       U_SsiPrbsRateGen: entity work.SsiPrbsRateGen
          generic map (
-            AXI_ERROR_RESP_G           => AXI_RESP_OK_C,
             VALID_THOLD_G              => 128,
             VALID_BURST_MODE_G         => true,
             FIFO_ADDR_WIDTH_G          => 10,
@@ -238,7 +237,6 @@ begin
             axilWriteSlave  => prbAxilWriteSlave(i));
 
       U_AxiLiteAsync: entity work.AxiLiteAsync
-         generic map ( AXI_ERROR_RESP_G => AXI_RESP_OK_C )
          port map (
             sAxiClk         => axiClk,
             sAxiClkRst      => axiClkRst,
