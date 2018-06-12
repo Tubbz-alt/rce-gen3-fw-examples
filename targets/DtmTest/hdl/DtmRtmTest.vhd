@@ -564,6 +564,7 @@ begin
    U_SsiPrbsRx: entity work.SsiPrbsRx 
       generic map (
          TPD_G                      => 1 ns,
+         SLAVE_READY_EN_G          => true,          
          STATUS_CNT_WIDTH_G         => 32,
          ALTERA_SYN_G               => false,
          ALTERA_RAM_G               => "M9K",
