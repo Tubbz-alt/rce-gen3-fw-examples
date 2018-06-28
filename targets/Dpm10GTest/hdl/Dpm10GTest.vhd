@@ -203,18 +203,8 @@ begin
          mAxiReadSlaves      => muxAxilReadSlaves);
 
    -- Empty AXI Slave
-   U_AxiLiteEmpty: entity work.AxiLiteEmpty 
-      generic map (
-         NUM_READ_REG_G  => 2
-      ) port map (
-         axiClk          => axiClk,
-         axiClkRst       => axiClkRst,
-         axiReadMaster   => muxAxilReadMasters(1),
-         axiReadSlave    => muxAxilReadSlaves(1),
-         axiWriteMaster  => muxAxilWriteMasters(1),
-         axiWriteSlave   => muxAxilWriteSlaves(1),
-         readRegister    => readRegisters
-      );
+   muxAxilReadSlaves(1)  <= AXI_LITE_READ_SLAVE_EMPTY_OK_C;
+   muxAxilWriteSlaves(1) <= AXI_LITE_WRITE_SLAVE_EMPTY_OK_C;   
 
    U_Freq: entity work.SyncClockFreq 
       generic map (
