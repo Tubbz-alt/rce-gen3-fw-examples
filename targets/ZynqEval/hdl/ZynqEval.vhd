@@ -88,18 +88,8 @@ begin
       );
 
    -- Empty AXI Slave
-   U_AxiLiteEmpty: entity work.AxiLiteEmpty 
-      port map (
-         axiClk          => axiClk,
-         axiClkRst       => axiClkRst,
-         axiReadMaster   => extAxilReadMaster,
-         axiReadSlave    => extAxilReadSlave,
-         axiWriteMaster  => extAxilWriteMaster,
-         axiWriteSlave   => extAxilWriteSlave,
-         writeRegister   => writeRegister,
-         readRegister    => readRegister
-      );
-
+   extAxilReadSlave  <= AXI_LITE_READ_SLAVE_EMPTY_OK_C;
+   extAxilWriteSlave <= AXI_LITE_WRITE_SLAVE_EMPTY_OK_C;   
 
    --------------------------------------------------
    -- PPI Loopback
