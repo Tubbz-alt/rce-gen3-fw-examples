@@ -116,8 +116,8 @@ begin
       generic map (
          TPD_G          => TPD_C,
          BUILD_INFO_G   => BUILD_INFO_G,
-         --RCE_DMA_MODE_G => RCE_DMA_AXISV2_C,
-         RCE_DMA_MODE_G => RCE_DMA_AXIS_C,
+         RCE_DMA_MODE_G => RCE_DMA_AXISV2_C,
+         --RCE_DMA_MODE_G => RCE_DMA_AXIS_C,
          ETH_10G_EN_G   => false
       ) port map (
          i2cSda                   => i2cSda,
