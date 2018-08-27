@@ -96,7 +96,7 @@ begin
    --------------------------------------------------
    -- Core
    --------------------------------------------------
-   U_Core : entity work.DpmCore 
+   U_DpmCore : entity work.DpmCore 
       generic map (
          TPD_G          => TPD_C,
          BUILD_INFO_G   => BUILD_INFO_G,

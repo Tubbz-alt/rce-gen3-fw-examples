@@ -134,7 +134,7 @@ begin
    -----------
    -- DPM Core
    -----------
-   U_Core : entity work.DpmCore
+   U_DpmCore : entity work.DpmCore
       generic map (
          TPD_G              => TPD_G,
          RCE_DMA_MODE_G     => RCE_DMA_AXIS_C,

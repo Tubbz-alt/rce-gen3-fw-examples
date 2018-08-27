@@ -143,7 +143,7 @@ begin
    -----------
    -- DPM Core
    -----------
-   U_Core : entity work.DpmCore
+   U_DpmCore : entity work.DpmCore
       generic map (
          TPD_G          => TPD_G,
          BUILD_INFO_G   => BUILD_INFO_G,
