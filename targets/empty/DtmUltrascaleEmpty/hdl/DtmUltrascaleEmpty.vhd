@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
--- File       : DpmUltrascaleEmpty.vhd
+-- File       : DtmUltrascaleEmpty.vhd
 -- Company    : SLAC National Accelerator Laboratory
 -- Created    : 2018-06-13
--- Last update: 2018-08-30
+-- Last update: 2018-08-31
 -------------------------------------------------------------------------------
 -- Description: Top Level Firmware Target
 -------------------------------------------------------------------------------
@@ -27,7 +27,7 @@ use work.RceG3Pkg.all;
 library unisim;
 use unisim.vcomponents.all;
 
-entity DpmUltrascaleEmpty is
+entity DtmUltrascaleEmpty is
    generic (
       TPD_G        : time := 1 ns;
       BUILD_INFO_G : BuildInfoType);
@@ -37,34 +37,35 @@ entity DpmUltrascaleEmpty is
       -- I2C
       i2cSda      : inout sl;
       i2cScl      : inout sl;
-      -- Ethernet
-      ethRxP      : in    slv(3 downto 0);
-      ethRxM      : in    slv(3 downto 0);
-      ethTxP      : out   slv(3 downto 0);
-      ethTxM      : out   slv(3 downto 0);
+      -- COB Ethernet
+      ethRxP      : in    sl;
+      ethRxM      : in    sl;
+      ethTxP      : out   sl;
+      ethTxM      : out   sl;
       ethRefClkP  : in    sl;
       ethRefClkM  : in    sl;
       -- RTM High Speed
-      dpmToRtmHsP : out   slv(11 downto 0);
-      dpmToRtmHsM : out   slv(11 downto 0);
-      rtmToDpmHsP : in    slv(11 downto 0);
-      rtmToDpmHsM : in    slv(11 downto 0);
-      -- Reference Clocks
-      locRefClkP  : in    sl;
-      locRefClkM  : in    sl;
-      dtmRefClkP  : in    sl;
-      dtmRefClkM  : in    sl;
-      -- DTM Signals
-      dtmClkP     : in    slv(1 downto 0);
-      dtmClkM     : in    slv(1 downto 0);
-      dtmFbP      : out   sl;
-      dtmFbM      : out   sl;
-      -- Clock Select
-      clkSelA     : out   slv(1 downto 0);
-      clkSelB     : out   slv(1 downto 0));
-end DpmUltrascaleEmpty;
+      dtmToRtmHsP : out   sl;
+      dtmToRtmHsM : out   sl;
+      rtmToDtmHsP : in    sl;
+      rtmToDtmHsM : in    sl;
+      -- RTM Low Speed
+      dtmToRtmLsP : inout slv(5 downto 0);
+      dtmToRtmLsM : inout slv(5 downto 0);
+      -- DPM Signals
+      dpmClkP     : out   slv(2 downto 0);
+      dpmClkM     : out   slv(2 downto 0);
+      dpmFbP      : in    slv(7 downto 0);
+      dpmFbM      : in    slv(7 downto 0);
+      -- Backplane Clocks
+      bpClkIn     : in    slv(5 downto 0);
+      bpClkOut    : out   slv(5 downto 0);
+      -- IPMI
+      dtmToIpmiP  : out   slv(1 downto 0);
+      dtmToIpmiM  : out   slv(1 downto 0));
+end DtmUltrascaleEmpty;
 
-architecture TOP_LEVEL of DpmUltrascaleEmpty is
+architecture TOP_LEVEL of DtmUltrascaleEmpty is
 
    signal axilClk         : sl;
    signal axilRst         : sl;
@@ -87,27 +88,26 @@ begin
    --------------------------------------------------
    -- Core
    --------------------------------------------------
-   U_DpmCore : entity work.DpmCore
+   U_DtmCore : entity work.DtmCore
       generic map (
          TPD_G          => TPD_G,
          BUILD_INFO_G   => BUILD_INFO_G,
          RCE_DMA_MODE_G => RCE_DMA_AXISV2_C,
+         COB_GTE_C10_G  => true,  -- true = COB with Mellanox ETH SW         
          ETH_TYPE_G     => "10GBASE-KR")
       port map (
          -- IPMI I2C Ports
          i2cSda             => i2cSda,
          i2cScl             => i2cScl,
-         -- Clock Select
-         clkSelA            => clkSelA,
-         clkSelB            => clkSelB,
-         -- Ethernet Ports
+         -- COB Ethernet
          ethRxP             => ethRxP,
          ethRxM             => ethRxM,
          ethTxP             => ethTxP,
          ethTxM             => ethTxM,
          ethRefClkP         => ethRefClkP,
          ethRefClkM         => ethRefClkM,
-         -- AXI-Lite Register Interface [0xA0000000:0xAFFFFFFF]
+         -- AXI-Lite Register Interface
+         -- 0x90000000 - 0x97FFFFFF (COB_MIN_C10_G = True)         
          axiClk             => axilClk,
          axiClkRst          => axilRst,
          extAxilReadMaster  => axilReadMaster,
@@ -133,33 +133,39 @@ begin
    U_TERM_GTs : entity work.Gthe4ChannelDummy
       generic map (
          TPD_G   => TPD_G,
-         WIDTH_G => 12)
+         WIDTH_G => 1)
       port map (
-         refClk => axilClk,
-         gtRxP  => rtmToDpmHsP,
-         gtRxN  => rtmToDpmHsM,
-         gtTxP  => dpmToRtmHsP,
-         gtTxN  => dpmToRtmHsM);
+         refClk   => axilClk,
+         gtRxP(0) => rtmToDtmHsP,
+         gtRxN(0) => rtmToDtmHsM,
+         gtTxP(0) => dtmToRtmHsP,
+         gtTxN(0) => dtmToRtmHsM);
 
    ------------
-   -- DTM Clock
+   -- DPM Clock
    ------------
-   U_DtmClkgen : for i in 1 downto 0 generate
-      U_DtmClkIn : IBUFDS
-         generic map (DIFF_TERM => true)
+   U_DpmClkGen : for i in 0 to 2 generate
+      U_DpmClkOut : OBUFDS
          port map(
-            I  => dtmClkP(i),
-            IB => dtmClkM(i),
-            O  => open);
+            O  => dpmClkP(i),
+            OB => dpmClkM(i),
+            I  => '0');
    end generate;
 
    ---------------
-   -- DTM Feedback
+   -- DPM Feedback
    ---------------
-   U_DtmFbOut : OBUFDS
-      port map(
-         O  => dtmFbP,
-         OB => dtmFbM,
-         I  => '0');
+   U_DpmFbGen : for i in 0 to 7 generate
+      U_DpmFbIn : IBUFDS
+         port map(
+            I  => dpmFbP(i),
+            IB => dpmFbM(i),
+            O  => open);
+   end generate;
+
+   -------------------
+   -- Backplane Clocks
+   -------------------
+   bpClkOut <= (others => '0');
 
 end TOP_LEVEL;
