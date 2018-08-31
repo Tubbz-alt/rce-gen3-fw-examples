@@ -542,7 +542,7 @@ begin
          FIFO_ADDR_WIDTH_G          => 9,
          FIFO_PAUSE_THRESH_G        => 256,
          MASTER_AXI_STREAM_CONFIG_G => SSI_PGP2B_CONFIG_C,
-         MASTER_AXI_PIPE_STAGES_G   => 0
+         MASTER_AXI_PIPE_STAGES_G   => 1
       ) port map (
 
          mAxisClk     => pgpClk,
@@ -578,9 +578,9 @@ begin
          FIFO_ADDR_WIDTH_G          => 9,
          FIFO_PAUSE_THRESH_G        => 256,
          SLAVE_AXI_STREAM_CONFIG_G  => SSI_PGP2B_CONFIG_C,
-         SLAVE_AXI_PIPE_STAGES_G    => 0,
+         SLAVE_AXI_PIPE_STAGES_G    => 1,
          MASTER_AXI_STREAM_CONFIG_G => SSI_PGP2B_CONFIG_C,
-         MASTER_AXI_PIPE_STAGES_G   => 0
+         MASTER_AXI_PIPE_STAGES_G   => 1
       ) port map (
          sAxisClk        => pgpClk,
          sAxisRst        => pgpClkRst,
