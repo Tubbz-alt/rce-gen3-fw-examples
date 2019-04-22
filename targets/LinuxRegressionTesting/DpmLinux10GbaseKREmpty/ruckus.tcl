@@ -6,5 +6,5 @@ loadRuckusTcl $::env(TOP_DIR)/submodules/surf
 loadRuckusTcl $::env(TOP_DIR)/submodules/rce-gen3-fw-lib/DpmCore
 
 # Load local Source Code and constraints
-loadSource -dir       "$::DIR_PATH/hdl"
-loadConstraints -dir  "$::DIR_PATH/hdl"
+loadSource -dir       "$::DIR_PATH/hdl/"
+loadConstraints -dir  "$::DIR_PATH/hdl/"

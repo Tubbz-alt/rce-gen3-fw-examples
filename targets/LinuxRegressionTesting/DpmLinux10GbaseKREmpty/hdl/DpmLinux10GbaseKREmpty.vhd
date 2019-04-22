@@ -1,10 +1,15 @@
 -------------------------------------------------------------------------------
--- File       : DpmEmpty.vhd
--- Company    : SLAC National Accelerator Laboratory
--- Created    : 2018-06-13
--- Last update: 2018-08-30
+-- Title      : 
 -------------------------------------------------------------------------------
--- Description: Top Level Firmware Target
+-- File       : DpmLinux10GbaseKREmpty.vhd
+-- Author     : Ryan Herbst <rherbst@slac.stanford.edu>
+-- Company    : SLAC National Accelerator Laboratory
+-- Created    : 2015-09-03
+-- Last update: 2019-04-17
+-- Platform   : 
+-- Standard   : VHDL'93/02
+-------------------------------------------------------------------------------
+-- Description: AXIS 1GbE 
 -------------------------------------------------------------------------------
 -- This file is part of 'RCE Development Firmware'.
 -- It is subject to the license terms in the LICENSE.txt file found in the 
@@ -13,21 +18,23 @@
 -- No part of 'RCE Development Firmware', including this file, 
 -- may be copied, modified, propagated, or distributed except according to 
 -- the terms contained in the LICENSE.txt file.
--------------------------------------------------------------------------------
+------------------------------------------------------------------------------
 
-library ieee;
-use ieee.std_logic_1164.all;
+library IEEE;
+use IEEE.STD_LOGIC_1164.all;
 
+library UNISIM;
+use UNISIM.VCOMPONENTS.all;
+use work.all;
+use work.RceG3Pkg.all;
 use work.StdRtlPkg.all;
 use work.AxiLitePkg.all;
-use work.AxiPkg.all;
 use work.AxiStreamPkg.all;
-use work.RceG3Pkg.all;
+use work.Gtx7CfgPkg.all;
+use work.Pgp2bPkg.all;
+use work.EthMacPkg.all;
 
-library unisim;
-use unisim.vcomponents.all;
-
-entity DpmEmpty is
+entity DpmLinux10GbaseKREmpty is
    generic (
       TPD_G        : time := 1 ns;
       BUILD_INFO_G : BuildInfoType);
@@ -62,9 +69,9 @@ entity DpmEmpty is
       -- Clock Select
       clkSelA     : out   slv(1 downto 0);
       clkSelB     : out   slv(1 downto 0));
-end DpmEmpty;
+end DpmLinux10GbaseKREmpty;
 
-architecture TOP_LEVEL of DpmEmpty is
+architecture TOP_LEVEL of DpmLinux10GbaseKREmpty is
 
    signal axilClk         : sl;
    signal axilRst         : sl;
@@ -89,10 +96,17 @@ begin
    --------------------------------------------------
    U_DpmCore : entity work.DpmCore
       generic map (
-         TPD_G          => TPD_G,
-         BUILD_INFO_G   => BUILD_INFO_G,
-         RCE_DMA_MODE_G => RCE_DMA_AXISV2_C,
-         ETH_TYPE_G     => "10GBASE-KR")
+         TPD_G              => TPD_G,
+         RCE_DMA_MODE_G     => RCE_DMA_AXIS_C,
+         BUILD_INFO_G       => BUILD_INFO_G,
+         ETH_TYPE_G         => "10GBASE-KR",
+         UDP_SERVER_EN_G    => true,
+         UDP_SERVER_SIZE_G  => 1,
+         UDP_SERVER_PORTS_G => (0 => 8192),
+         BYP_EN_G           => false,
+         BYP_ETH_TYPE_G     => x"AAAA",
+         VLAN_EN_G          => false,
+         VLAN_SIZE_G        => 1)
       port map (
          -- IPMI I2C Ports
          i2cSda             => i2cSda,
