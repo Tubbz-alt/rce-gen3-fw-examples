@@ -10,8 +10,9 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
-use work.all;
-use work.StdRtlPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
 
 package arraytype is
     type    dataarray is array(31 downto 0) of std_logic_vector(17 downto 0);

@@ -23,16 +23,17 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 
-library UNISIM;
-use UNISIM.VCOMPONENTS.all;
-use work.all;
-use work.RceG3Pkg.all;
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
-use work.Gtx7CfgPkg.all;
-use work.Pgp2bPkg.all;
-use work.EthMacPkg.all;
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiPkg.all;
+use surf.AxiStreamPkg.all;
+
+library rce_gen3_fw_lib;
+use rce_gen3_fw_lib.RceG3Pkg.all;
+
+library unisim;
+use unisim.vcomponents.all;
 
 entity DpmLinux40GbaseKR4Empty is
    generic (
@@ -94,7 +95,7 @@ begin
    --------------------------------------------------
    -- Core
    --------------------------------------------------
-   U_DpmCore : entity work.DpmCore
+   U_DpmCore : entity rce_gen3_fw_lib.DpmCore
       generic map (
          TPD_G              => TPD_G,
          RCE_DMA_MODE_G     => RCE_DMA_AXIS_C,
@@ -144,7 +145,7 @@ begin
    ----------
    -- RTM GTs
    ----------
-   U_TERM_GTs : entity work.Gtxe2ChannelDummy
+   U_TERM_GTs : entity surf.Gtxe2ChannelDummy
       generic map (
          TPD_G   => TPD_G,
          WIDTH_G => 12)

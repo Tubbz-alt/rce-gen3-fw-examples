@@ -23,16 +23,19 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 
-library UNISIM;
-use UNISIM.VCOMPONENTS.all;
-use work.all;
-use work.RceG3Pkg.all;
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
-use work.Gtx7CfgPkg.all;
-use work.Pgp2bPkg.all;
-use work.EthMacPkg.all;
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiPkg.all;
+use surf.AxiStreamPkg.all;
+use surf.Gtx7CfgPkg.all;
+use surf.Pgp2bPkg.all;
+
+library rce_gen3_fw_lib;
+use rce_gen3_fw_lib.RceG3Pkg.all;
+
+library unisim;
+use unisim.vcomponents.all;
 
 entity DpmLinux10GbaseKR is
    generic (
@@ -129,7 +132,7 @@ begin
    -----------
    -- DPM Core
    -----------
-   U_DpmCore : entity work.DpmCore
+   U_DpmCore : entity rce_gen3_fw_lib.DpmCore
       generic map (
          TPD_G              => TPD_G,
          RCE_DMA_MODE_G     => RCE_DMA_AXIS_C,
@@ -209,7 +212,7 @@ begin
          I => locRefClk,
          O => locRefClkG);
 
-   ClockManager7_1 : entity work.ClockManager7
+   ClockManager7_1 : entity surf.ClockManager7
       generic map (
          TPD_G              => TPD_G,
          TYPE_G             => "MMCM",
@@ -235,7 +238,7 @@ begin
    -------------------
    -- PPI to PGP Array
    -------------------
-   PpiPgpArray_1 : entity work.PpiPgpArray
+   PpiPgpArray_1 : entity rce_gen3_fw_lib.PpiPgpArray
       generic map (
          TPD_G                   => TPD_G,
          NUM_LANES_G             => PGP_LANES_G,
@@ -281,7 +284,7 @@ begin
    -- PGP GTX Array
    ----------------
    PGP_GTX_GEN : for i in PGP_LANES_G-1 downto 0 generate
-      Pgp2bGtx7VarLat_1 : entity work.Pgp2bGtx7VarLat
+      Pgp2bGtx7VarLat_1 : entity surf.Pgp2bGtx7VarLat
          generic map (
             TPD_G                 => TPD_G,
             STABLE_CLOCK_PERIOD_G => 4.0E-9,

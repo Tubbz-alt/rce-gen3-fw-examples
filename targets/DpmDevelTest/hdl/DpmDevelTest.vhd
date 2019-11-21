@@ -13,12 +13,17 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 
-library UNISIM;
-use UNISIM.VCOMPONENTS.ALL;
-use work.RceG3Pkg.all;
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiPkg.all;
+use surf.AxiStreamPkg.all;
+
+library rce_gen3_fw_lib;
+use rce_gen3_fw_lib.RceG3Pkg.all;
+
+library unisim;
+use unisim.vcomponents.all;
 
 entity DpmDevelTest is
    generic (
@@ -114,12 +119,12 @@ begin
    --------------------------------------------------
    -- Core
    --------------------------------------------------
-   U_DpmCore : entity work.DpmCore 
+   U_DpmCore : entity rce_gen3_fw_lib.DpmCore 
       generic map (
          TPD_G          => TPD_C,
          BUILD_INFO_G   => BUILD_INFO_G,
          RCE_DMA_MODE_G => RCE_DMA_AXIS_C,
-         ETH_10G_EN_G   => false
+         ETH_TYPE_G     => "ZYNQ-GEM"
       ) port map (
          i2cSda                   => i2cSda,
          i2cScl                   => i2cScl,
@@ -160,7 +165,7 @@ begin
 
    -- Empty AXI Slave
    -- 0xA0000000 - 0xAFFFFFFF
-   --U_AxiLiteEmpty: entity work.AxiLiteEmpty 
+   --U_AxiLiteEmpty: entity surf.AxiLiteEmpty 
    --   port map (
    --      axiClk          => axiClk,
    --      axiClkRst       => axiClkRst,

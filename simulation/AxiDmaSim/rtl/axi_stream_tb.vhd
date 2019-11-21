@@ -13,12 +13,15 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
 
-use work.StdRtlPkg.all;
-use work.AxiStreamPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiPkg.all;
-use work.AxiDmaPkg.all;
-use work.RceG3Pkg.all;
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiStreamPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiPkg.all;
+use surf.AxiDmaPkg.all;
+
+library rce_gen3_fw_lib;
+use rce_gen3_fw_lib.RceG3Pkg.all;
 
 entity axi_stream_tb is end axi_stream_tb;
 
@@ -85,7 +88,7 @@ begin
 --      wait;
 --   end process;
 
-   U_AxiStreamDmaV2: entity work.AxiStreamDmaV2 
+   U_AxiStreamDmaV2: entity surf.AxiStreamDmaV2 
       generic map (
          TPD_G              => 1 ns,
          DESC_AWIDTH_G      => 11,
@@ -121,7 +124,7 @@ begin
          axiWriteCtrl     => axiWriteCtrl);
 
    U_AxiGen: for i in 0 to CHAN_COUNT_C generate
-      U_ReadTest: entity work.AxiReadEmulate
+      U_ReadTest: entity surf.AxiReadEmulate
          generic map (
             TPD_G        => 1 ns,
             LATENCY_G    => 31,
@@ -133,7 +136,7 @@ begin
             axiReadMaster => axiReadMaster(i),
             axiReadSlave  => axiReadSlave(i));
 
-      U_WriteTest: entity work.AxiWriteEmulate
+      U_WriteTest: entity surf.AxiWriteEmulate
          generic map (
             TPD_G        => 1 ns,
             --LATENCY_G    => 31,
@@ -197,7 +200,7 @@ begin
 
 
    U_PrbsGen: for i in 0 to 7 generate
-      U_Prbs: entity work.SsiPrbsTx
+      U_Prbs: entity surf.SsiPrbsTx
          generic map (
             AXI_ERROR_RESP_G           => AXI_RESP_OK_C,
             GEN_SYNC_FIFO_G            => false,
@@ -215,7 +218,7 @@ begin
             packetLength    => X"00010000");
    end generate;
 
-   U_PrbsMux: entity work.AxiStreamMux
+   U_PrbsMux: entity surf.AxiStreamMux
       generic map (
          NUM_SLAVES_G   => 8,
          MODE_G         => "INDEXED",

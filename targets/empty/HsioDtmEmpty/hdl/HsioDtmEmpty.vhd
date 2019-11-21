@@ -18,11 +18,14 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiPkg.all;
-use work.AxiStreamPkg.all;
-use work.RceG3Pkg.all;
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiPkg.all;
+use surf.AxiStreamPkg.all;
+
+library rce_gen3_fw_lib;
+use rce_gen3_fw_lib.RceG3Pkg.all;
 
 library unisim;
 use unisim.vcomponents.all;
@@ -84,7 +87,7 @@ begin
    -----------
    -- DTM Core
    -----------
-   U_HsioCore : entity work.HsioCore
+   U_HsioCore : entity rce_gen3_fw_lib.HsioCore
       generic map (
          TPD_G          => TPD_G,
          BUILD_INFO_G   => BUILD_INFO_G,

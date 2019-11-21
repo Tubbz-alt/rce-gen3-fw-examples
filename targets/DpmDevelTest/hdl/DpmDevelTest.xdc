@@ -25,3 +25,5 @@ set_property PACKAGE_PIN AE7  [get_ports pgpRxM]
 set_property PACKAGE_PIN AK2  [get_ports pgpTxP]
 set_property PACKAGE_PIN AK1  [get_ports pgpTxM]
 
+set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_DpmCore/U_RceG3Top/U_RceG3Clocks/U_MMCM/MmcmGen.U_Mmcm/CLKOUT3]] -group [get_clocks pgpClk]
+set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_DpmCore/U_RceG3Top/U_RceG3Clocks/U_MMCM/MmcmGen.U_Mmcm/CLKOUT0]] -group [get_clocks pgpClk]

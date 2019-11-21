@@ -19,10 +19,11 @@ use IEEE.numeric_std.all;
 library UNISIM;
 use UNISIM.VCOMPONENTS.ALL;
 
-use work.StdRtlPkg.all;
-use work.Pgp2bPkg.all;
-use work.AxiStreamPkg.all;
-use work.AxiLitePkg.all;
+library surf;
+use surf.StdRtlPkg.all;
+use surf.Pgp2bPkg.all;
+use surf.AxiStreamPkg.all;
+use surf.AxiLitePkg.all;
 
 entity DpmRtmTest is
    generic (
@@ -131,7 +132,7 @@ begin
    -- Registers
    --------------------------------------------------
 
-   U_AxiLiteAsync : entity work.AxiLiteAsync 
+   U_AxiLiteAsync : entity surf.AxiLiteAsync 
       generic map (
          TPD_G            => TPD_G,
          NUM_ADDR_BITS_G  => 16
@@ -150,7 +151,7 @@ begin
          mAxiWriteSlave    => tmpAxiWriteSlave
       );
 
-   U_AxiCrossbar : entity work.AxiLiteCrossbar 
+   U_AxiCrossbar : entity surf.AxiLiteCrossbar 
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 1,
@@ -315,7 +316,7 @@ begin
    U_PgpGen : for i in 0 to 11 generate
 
       -- PGP Core
-      U_Pgp: entity work.Pgp2bGtx7MultiLane 
+      U_Pgp: entity surf.Pgp2bGtx7MultiLane 
          generic map (
             TPD_G                 => 1 ns,
             -----------------------------------------
@@ -419,7 +420,7 @@ begin
          );
 
       -- Reset
-      U_pgpRxRstGen : entity work.RstSync
+      U_pgpRxRstGen : entity surf.RstSync
          generic map (
             TPD_G           => 1 ns,
             IN_POLARITY_G   => '1',
@@ -433,7 +434,7 @@ begin
          );
 
       -- Reset
-      U_pgpTxRstGen : entity work.RstSync
+      U_pgpTxRstGen : entity surf.RstSync
          generic map (
             TPD_G           => 1 ns,
             IN_POLARITY_G   => '1',
@@ -500,16 +501,11 @@ begin
          end if;
       end process;
 
-      U_SsiPrbsTx : entity work.SsiPrbsTx
+      U_SsiPrbsTx : entity surf.SsiPrbsTx
          generic map (
             TPD_G                      => TPD_G,      
-            ALTERA_SYN_G               => false,
-            ALTERA_RAM_G               => "M9K",
-            XIL_DEVICE_G               => "7SERIES",
-            BRAM_EN_G                  => true,
-            USE_BUILT_IN_G             => false,
+            MEMORY_TYPE_G              => "block",
             GEN_SYNC_FIFO_G            => false,
-            CASCADE_SIZE_G             => 1,
             PRBS_SEED_SIZE_G           => 32,
             PRBS_TAPS_G                => (0 => 16),
             FIFO_ADDR_WIDTH_G          => 9,
@@ -534,17 +530,12 @@ begin
       pgpTxMasters((i*4)+3 downto (i*4)+1) <= (others=>AXI_STREAM_MASTER_INIT_C);
 
 
-      U_SsiPrbsRx: entity work.SsiPrbsRx 
+      U_SsiPrbsRx: entity surf.SsiPrbsRx 
          generic map (
             TPD_G                      => TPD_G,
             SLAVE_READY_EN_G           => false,  
             STATUS_CNT_WIDTH_G         => 32,
-            ALTERA_SYN_G               => false,
-            ALTERA_RAM_G               => "M9K",
-            CASCADE_SIZE_G             => 1,
-            XIL_DEVICE_G               => "7SERIES",
-            BRAM_EN_G                  => true,
-            USE_BUILT_IN_G             => false,
+            MEMORY_TYPE_G              => "block",
             GEN_SYNC_FIFO_G            => false,
             PRBS_SEED_SIZE_G           => 32,
             PRBS_TAPS_G                => (0 => 16),
@@ -558,28 +549,13 @@ begin
             sAxisClk        => pgpClk,
             sAxisRst        => pgpClkRst,
             sAxisMaster     => pgpRxMasters(i*4),
-            sAxisSlave      => open,
             sAxisCtrl       => pgpRxCtrl(i*4),
-            mAxisClk        => pgpClk,
-            mAxisRst        => pgpClkRst,
-            mAxisMaster     => open,
-            mAxisSlave      => AXI_STREAM_SLAVE_FORCE_C,
             axiClk          => pgpCLk,
             axiRst          => pgpClkRst,
             axiReadMaster   => pgpAxiReadMaster(i+1),
             axiReadSlave    => pgpAxiReadSlave(i+1),
             axiWriteMaster  => pgpAxiWriteMaster(i+1),
-            axiWriteSlave   => pgpAxiWriteSlave(i+1),
-            updatedResults  => open,
-            busy            => open,
-            errMissedPacket => open,
-            errLength       => open,
-            errDataBus      => open,
-            errEofe         => open,
-            errWordCnt      => open,
-            errbitCnt       => open,
-            packetRate      => open,
-            packetLength    => open
+            axiWriteSlave   => pgpAxiWriteSlave(i+1)
          ); 
 
       pgpRxCtrl((i*4)+3 downto (i*4)+1) <= (others=>AXI_STREAM_CTRL_UNUSED_C);
@@ -670,7 +646,7 @@ begin
 
 
    -- Reset Gen
-   U_pgpClkRstGen : entity work.RstSync
+   U_pgpClkRstGen : entity surf.RstSync
       generic map (
          TPD_G           => 1 ns,
          IN_POLARITY_G   => '0',
@@ -684,7 +660,7 @@ begin
       );
 
    -- Reset Gen
-   U_pgpClkRstSwGen : entity work.RstSync
+   U_pgpClkRstSwGen : entity surf.RstSync
       generic map (
          TPD_G           => 1 ns,
          IN_POLARITY_G   => '1',

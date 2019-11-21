@@ -24,16 +24,19 @@ use IEEE.STD_LOGIC_UNSIGNED.all;
 use IEEE.STD_LOGIC_ARITH.all;
 use IEEE.numeric_std.all;
 
-library UNISIM;
-use UNISIM.VCOMPONENTS.all;
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiPkg.all;
+use surf.AxiStreamPkg.all;
+use surf.Pgp2bPkg.all;
+use surf.Gtx7CfgPkg.all;
 
-use work.StdRtlPkg.all;
-use work.Pgp2bPkg.all;
-use work.AxiStreamPkg.all;
-use work.AxiLitePkg.all;
-use work.SsiPkg.all;
-use work.RceG3Pkg.all;
-use work.Gtx7CfgPkg.all;
+library rce_gen3_fw_lib;
+use rce_gen3_fw_lib.RceG3Pkg.all;
+
+library unisim;
+use unisim.vcomponents.all;
 
 entity DevelPgpLane is
    generic (
@@ -111,7 +114,7 @@ begin
          I => locRefClk,
          O => locRefClkG);
 
-   ClockManager7_1 : entity work.ClockManager7
+   ClockManager7_1 : entity surf.ClockManager7
       generic map (
          TPD_G              => TPD_G,
          TYPE_G             => "MMCM",
@@ -131,7 +134,7 @@ begin
          clkOut(0) => pgpClk,
          rstOut(0) => pgpClkRst);
 
-   Pgp2bGtx7VarLat_1 : entity work.Pgp2bGtx7VarLat
+   Pgp2bGtx7VarLat_1 : entity surf.Pgp2bGtx7VarLat
       generic map (
          TPD_G                 => TPD_G,
          STABLE_CLOCK_PERIOD_G => 4.0E-9,
@@ -185,7 +188,7 @@ begin
          pgpRxCtrl(3)     => pgpRxCtrl);
 
    -- PGP Axil Controller
-   U_Pgp2bAxi : entity work.Pgp2bAxi 
+   U_Pgp2bAxi : entity surf.Pgp2bAxi 
       generic map (
          TPD_G              => TPD_G,
          COMMON_TX_CLK_G    => false,
@@ -213,19 +216,14 @@ begin
          axilWriteSlave    => axiWriteSlave
       );
 
-   U_RxFifo : entity work.AxiStreamFifo
+   U_RxFifo : entity surf.AxiStreamFifo
       generic map (
          TPD_G               => TPD_G,
          PIPE_STAGES_G       => 1,
          SLAVE_READY_EN_G    => false,
          VALID_THOLD_G       => 1,
-         BRAM_EN_G           => true,
-         XIL_DEVICE_G        => "7SERIES",
-         USE_BUILT_IN_G      => false,
+         MEMORY_TYPE_G       => "block",
          GEN_SYNC_FIFO_G     => false,
-         ALTERA_SYN_G        => false,
-         ALTERA_RAM_G        => "M9K",
-         CASCADE_SIZE_G      => 1,
          FIFO_ADDR_WIDTH_G   => 9,
          FIFO_FIXED_THRESH_G => true,
          FIFO_PAUSE_THRESH_G => 255,
@@ -243,19 +241,14 @@ begin
          mAxisMaster     => pgpDataRxMaster,
          mAxisSlave      => pgpDataRxSlave);
 
-   U_TxFifo : entity work.AxiStreamFifo
+   U_TxFifo : entity surf.AxiStreamFifo
       generic map (
          TPD_G               => TPD_G,
          PIPE_STAGES_G       => 1,
          SLAVE_READY_EN_G    => true,
          VALID_THOLD_G       => 1,
-         BRAM_EN_G           => true,
-         XIL_DEVICE_G        => "7SERIES",
-         USE_BUILT_IN_G      => false,
+         MEMORY_TYPE_G       => "block",
          GEN_SYNC_FIFO_G     => false,
-         ALTERA_SYN_G        => false,
-         ALTERA_RAM_G        => "M9K",
-         CASCADE_SIZE_G      => 1,
          FIFO_ADDR_WIDTH_G   => 9,
          FIFO_FIXED_THRESH_G => true,
          FIFO_PAUSE_THRESH_G => 255,
@@ -273,7 +266,7 @@ begin
          mAxisMaster     => muxTxMaster,
          mAxisSlave      => muxTxSlave);
 
-   U_PgpTxMux : entity work.AxiStreamDeMux 
+   U_PgpTxMux : entity surf.AxiStreamDeMux 
       generic map (
          TPD_G         => TPD_G,
          NUM_MASTERS_G => 4

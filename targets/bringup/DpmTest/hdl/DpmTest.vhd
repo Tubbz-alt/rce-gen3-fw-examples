@@ -15,10 +15,15 @@ use IEEE.STD_LOGIC_1164.all;
 
 library UNISIM;
 use UNISIM.VCOMPONENTS.all;
-use work.RceG3Pkg.all;
-use work.StdRtlPkg.all;
-use work.AxiLitePkg.all;
-use work.AxiStreamPkg.all;
+
+library surf;
+use surf.StdRtlPkg.all;
+use surf.AxiLitePkg.all;
+use surf.AxiPkg.all;
+use surf.AxiStreamPkg.all;
+
+library rce_gen3_fw_lib;
+use rce_gen3_fw_lib.RceG3Pkg.all;
 
 entity DpmTest is
    generic (
@@ -106,7 +111,7 @@ begin
    --------------------------------------------------
    -- Core
    --------------------------------------------------
-   U_DpmCore : entity work.DpmCore
+   U_DpmCore : entity rce_gen3_fw_lib.DpmCore
       generic map (
          TPD_G          => TPD_G,
          BUILD_INFO_G   => BUILD_INFO_G,
@@ -145,7 +150,7 @@ begin
    -- AXI Lite Crossbar
    -- Base: 0xA0000000 - 0xAFFFFFFF
    -------------------------------------
-   U_AxiCrossbar : entity work.AxiLiteCrossbar
+   U_AxiCrossbar : entity surf.AxiLiteCrossbar
       generic map (
          TPD_G              => TPD_G,
          NUM_SLAVE_SLOTS_G  => 1,
@@ -201,7 +206,7 @@ begin
    dmaObSlave(2)  <= AXI_STREAM_SLAVE_FORCE_C;
 
    U_PrbsGen : for i in 0 to 3 generate
-      U_SsiPrbsRateGen : entity work.SsiPrbsRateGen
+      U_SsiPrbsRateGen : entity surf.SsiPrbsRateGen
          generic map (
             VALID_THOLD_G      => 128,
             VALID_BURST_MODE_G => true,
@@ -218,7 +223,7 @@ begin
             axilWriteMaster => prbAxilWriteMaster(i),
             axilWriteSlave  => prbAxilWriteSlave(i));
 
-      U_AxiLiteAsync : entity work.AxiLiteAsync
+      U_AxiLiteAsync : entity surf.AxiLiteAsync
          port map (
             sAxiClk         => axiClk,
             sAxiClkRst      => axiClkRst,
@@ -235,7 +240,7 @@ begin
 
    end generate;
 
-   U_PrbsMuxA : entity work.AxiStreamMux
+   U_PrbsMuxA : entity surf.AxiStreamMux
       generic map (
          NUM_SLAVES_G   => 2,
          MODE_G         => "INDEXED",
@@ -251,7 +256,7 @@ begin
          mAxisMaster  => dmaIbMaster(2),
          mAxisSlave   => dmaIbSlave(2));
 
-   U_PrbsMuxB : entity work.AxiStreamMux
+   U_PrbsMuxB : entity surf.AxiStreamMux
       generic map (
          NUM_SLAVES_G   => 2,
          MODE_G         => "INDEXED",
@@ -270,7 +275,7 @@ begin
    --------------------------------------------------
    -- Timing Signals
    --------------------------------------------------
-   U_DpmTimingSink : entity work.DpmTimingSink
+   U_DpmTimingSink : entity rce_gen3_fw_lib.DpmTimingSink
       generic map (
          TPD_G => TPD_G
          ) port map (

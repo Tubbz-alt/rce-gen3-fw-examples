@@ -35,3 +35,5 @@ build*
 *.mcs
 *.gz
 *.ltx
+*.hdf
+*.vho
